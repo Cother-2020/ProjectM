@@ -1,0 +1,22 @@
+const express = require('express');
+const router = express.Router();
+const prisma = require('../prismaClient');
+
+router.get('/', async (req, res) => {
+    const { categoryId } = req.query;
+    try {
+        const where = {};
+        if (categoryId) {
+            const parsedId = parseInt(categoryId);
+            if (!isNaN(parsedId)) {
+                where.categoryId = parsedId;
+            }
+        }
+        const products = await prisma.product.findMany({ where });
+        res.json(products);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+module.exports = router;

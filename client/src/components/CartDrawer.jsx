@@ -1,0 +1,127 @@
+import { XMarkIcon, TrashIcon } from '@heroicons/react/24/outline';
+import axios from 'axios';
+import { useState } from 'react';
+import { useCart } from '../context/CartContext';
+
+export default function CartDrawer() {
+    const { isCartOpen, closeCart, cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useCart();
+    const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+    // Use context total or calculate it? Context has it.
+
+    const handleCheckout = async () => {
+        setIsCheckingOut(true);
+        try {
+            const orderData = {
+                totalAmount: cartTotal,
+                items: cartItems.map(item => ({
+                    productId: item.id,
+                    quantity: item.quantity
+                }))
+            };
+            const res = await axios.post('/api/orders', orderData);
+            alert(`Order Placed! ID: ${res.data.id}`);
+            clearCart();
+            closeCart();
+        } catch (error) {
+            alert('Checkout Failed');
+            console.error(error);
+        } finally {
+            setIsCheckingOut(false);
+        }
+    };
+
+    if (!isCartOpen) return null;
+
+    // Remaining code uses cartItems, updateQuantity etc which are now from scope. 
+    // Need to make sure the prop usage in JSX matches the variables in scope. 
+    // They match exactly.
+
+    // I need to replace the component definition and the props usage in rendered JSX?
+    // The previous props names match the context names: updateQuantity, removeFromCart.
+    // So the JSX body can largely remain the same, except for 'onClose' -> 'closeCart' and 'total'
+
+    return (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+            <div className="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onClick={closeCart} />
+
+            <div className="fixed inset-y-0 right-0 flex max-w-full pl-10 pointer-events-none">
+                <div className="w-screen max-w-md pointer-events-auto bg-white shadow-xl flex flex-col h-full transform transition-transform duration-500 ease-in-out">
+
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 py-6 sm:px-6 border-b border-gray-200 bg-gray-50">
+                        <h2 className="text-lg font-bold font-heading text-gray-900">Shopping Cart</h2>
+                        <button onClick={closeCart} className="text-gray-400 hover:text-gray-500 transition-colors">
+                            <XMarkIcon className="h-6 w-6" />
+                        </button>
+                    </div>
+
+                    {/* Items */}
+                    <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+                        {cartItems.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 space-y-4">
+                                <ShoppingBagIcon className="w-16 h-16 text-gray-300" />
+                                <p className="text-lg">Your cart is empty.</p>
+                                <button onClick={closeCart} className="text-orange-600 font-bold hover:underline">Start Ordering</button>
+                            </div>
+                        ) : (
+                            <ul className="divide-y divide-gray-200">
+                                {cartItems.map((item) => (
+                                    <li key={item.id} className="flex py-6 group">
+                                        <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                            <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500" />
+                                        </div>
+                                        <div className="ml-4 flex flex-1 flex-col">
+                                            <div>
+                                                <div className="flex justify-between text-base font-medium text-gray-900">
+                                                    <h3 className="font-heading">{item.name}</h3>
+                                                    <p className="ml-4 text-orange-600 font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-1 items-end justify-between text-sm">
+                                                <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-1">
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm hover:text-orange-600">-</button>
+                                                    <span className="font-bold w-4 text-center">{item.quantity}</span>
+                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm hover:text-orange-600">+</button>
+                                                </div>
+                                                <button type="button" onClick={() => removeFromCart(item.id)} className="font-medium text-red-500 hover:text-red-700 transition-colors p-2 hover:bg-red-50 rounded-full">
+                                                    <TrashIcon className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+
+                    {/* Footer */}
+                    {cartItems.length > 0 && (
+                        <div className="border-t border-gray-200 px-4 py-6 sm:px-6 bg-gray-50">
+                            <div className="flex justify-between text-base font-medium text-gray-900 mb-4">
+                                <p>Subtotal</p>
+                                <p className="text-xl font-bold text-orange-600">${cartTotal.toFixed(2)}</p>
+                            </div>
+                            <button
+                                onClick={handleCheckout}
+                                disabled={isCheckingOut}
+                                className="flex w-full items-center justify-center rounded-xl border border-transparent bg-orange-600 px-6 py-4 text-base font-bold text-white shadow-lg shadow-orange-200 hover:bg-orange-700 hover:shadow-xl hover:-translate-y-1 transition-all disabled:bg-gray-400 disabled:shadow-none disabled:translate-y-0"
+                            >
+                                {isCheckingOut ? 'Processing...' : 'Checkout Now'}
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Helper to avoid undefined component
+function ShoppingBagIcon(props) {
+    return (
+        <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
+        </svg>
+    )
+}

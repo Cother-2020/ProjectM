@@ -1,13 +1,16 @@
 import { PlusIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from '../context/LanguageContext';
 
 export default function ProductCard({ product, onAddToCart }) {
+    const { t } = useTranslation();
+
     return (
-        <div className="group glass bg-white/80 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col h-full border border-white/50">
+        <div className="group glass bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col h-full border border-white/50 dark:border-gray-700">
             <div className="relative h-56 overflow-hidden">
                 <img
                     src={product.imageUrl}
                     alt={product.name}
-                    className="w-full h-full object-cover bg-gray-100 group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                    className="w-full h-full object-cover bg-gray-100 dark:bg-gray-700 group-hover:scale-110 transition-transform duration-700 ease-in-out"
                 />
 
                 {/* Overlay Gradient */}
@@ -26,7 +29,7 @@ export default function ProductCard({ product, onAddToCart }) {
                 <button
                     onClick={() => onAddToCart(product)}
                     className="absolute bottom-3 right-3 bg-white text-orange-600 p-3 rounded-full shadow-lg opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-orange-600 hover:text-white"
-                    title="Add to Cart"
+                    title={t('btn_add_to_cart')}
                 >
                     <PlusIcon className="w-6 h-6" />
                 </button>
@@ -34,17 +37,17 @@ export default function ProductCard({ product, onAddToCart }) {
 
             <div className="p-5 flex flex-col flex-1">
                 <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-xl font-heading text-slate-800 leading-tight group-hover:text-orange-600 transition-colors">{product.name}</h3>
-                    <span className="font-bold text-lg text-slate-900 bg-orange-50 px-2 py-1 rounded-lg ml-2">${product.price}</span>
+                    <h3 className="font-bold text-xl font-heading text-slate-800 dark:text-gray-100 leading-tight group-hover:text-orange-600 dark:group-hover:text-orange-500 transition-colors">{product.name}</h3>
+                    <span className="font-bold text-lg text-slate-900 dark:text-white bg-orange-50 dark:bg-gray-700 px-2 py-1 rounded-lg ml-2 border border-transparent dark:border-gray-600">${product.price}</span>
                 </div>
 
-                <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-4 flex-1">{product.description}</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed line-clamp-2 mb-4 flex-1">{product.description}</p>
 
                 <button
                     onClick={() => onAddToCart(product)}
                     className="w-full bg-orange-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-lg shadow-orange-200 hover:bg-orange-700 hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
-                    Add to Cart
+                    {t('btn_add_to_cart')}
                 </button>
             </div>
         </div>

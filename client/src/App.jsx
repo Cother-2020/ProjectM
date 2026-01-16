@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
+import { LanguageProvider } from './context/LanguageContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Menu from './pages/Menu';
 import CartDrawer from './components/CartDrawer';
@@ -14,29 +16,33 @@ function App() {
 
   return (
     <BrowserRouter>
-      <CartProvider>
-        <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
-          <Toaster position="top-right" />
-          <CartDrawer />
-          <Routes>
-            <Route path="/" element={
-              <>
-                <Navbar />
-                <main className="container mx-auto px-4 py-8">
-                  <Menu />
-                </main>
-              </>
-            } />
+      <ThemeProvider>
+        <LanguageProvider>
+          <CartProvider>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans transition-colors duration-300">
+              <Toaster position="top-right" />
+              <CartDrawer />
+              <Routes>
+                <Route path="/" element={
+                  <>
+                    <Navbar />
+                    <main className="container mx-auto px-4 py-8">
+                      <Menu />
+                    </main>
+                  </>
+                } />
 
-            {/* Admin Routes with Layout */}
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<Admin />} />
-              <Route path="menu" element={<MenuManager />} />
-              <Route path="categories" element={<CategoryManager />} />
-            </Route>
-          </Routes>
-        </div>
-      </CartProvider>
+                {/* Admin Routes with Layout */}
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<Admin />} />
+                  <Route path="menu" element={<MenuManager />} />
+                  <Route path="categories" element={<CategoryManager />} />
+                </Route>
+              </Routes>
+            </div>
+          </CartProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

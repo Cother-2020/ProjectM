@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { XMarkIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -101,7 +102,7 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="fixed inset-0 bg-black/50 transition-opacity backdrop-blur-sm" onClick={onClose} />
             <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
@@ -125,7 +126,7 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
 
                             <div className="grid grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Price ($)</label>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Price (¥)</label>
                                     <input type="number" step="0.01" className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-200 focus:border-orange-500 transition-all" required
                                         value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} placeholder="0.00" />
                                 </div>
@@ -140,17 +141,50 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Availability</label>
-                                <select
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-200 focus:border-orange-500 transition-all"
-                                    value={formData.availableTime}
-                                    onChange={e => setFormData({ ...formData, availableTime: e.target.value })}
-                                >
-                                    <option value="ALL">All Day</option>
-                                    <option value="BREAKFAST">Breakfast Only</option>
-                                    <option value="LUNCH">Lunch Only</option>
-                                    <option value="DINNER">Dinner Only</option>
-                                </select>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">Availability</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setFormData(prev => ({ ...prev, availableTime: 'ALL' }));
+                                        }}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${formData.availableTime === 'ALL'
+                                            ? 'bg-orange-600 border-orange-600 text-white shadow-md'
+                                            : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        All Day
+                                    </button>
+                                    {['BREAKFAST', 'LUNCH', 'DINNER'].map((time) => {
+                                        const isSelected = formData.availableTime !== 'ALL' && formData.availableTime.split(',').includes(time);
+                                        return (
+                                            <button
+                                                key={time}
+                                                type="button"
+                                                onClick={() => {
+                                                    setFormData(prev => {
+                                                        const current = prev.availableTime === 'ALL' ? [] : prev.availableTime.split(',');
+                                                        let newTimes;
+                                                        if (current.includes(time)) {
+                                                            newTimes = current.filter(t => t !== time);
+                                                            if (newTimes.length === 0) newTimes = ['ALL'];
+                                                        } else {
+                                                            newTimes = [...current, time];
+                                                        }
+                                                        return { ...prev, availableTime: newTimes.join(',') };
+                                                    });
+                                                }}
+                                                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${isSelected
+                                                    ? 'bg-orange-600 border-orange-600 text-white shadow-md'
+                                                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                    }`}
+                                            >
+                                                {time.charAt(0) + time.slice(1).toLowerCase()}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <p className="text-xs text-gray-400 mt-2">Select "All Day" or specific meal periods.</p>
                             </div>
 
                             <div>
@@ -188,6 +222,7 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

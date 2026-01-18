@@ -47,7 +47,8 @@ export function useMenuData() {
 
     const filteredProducts = products.filter(p => {
         if (selectedTime === 'ALL') return true;
-        return p.availableTime === 'ALL' || p.availableTime === selectedTime;
+        // Check if product is available for ALL day or if the specific time is included in the CSV string
+        return p.availableTime === 'ALL' || (p.availableTime && p.availableTime.includes(selectedTime));
     });
 
     return {

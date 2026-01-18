@@ -78,7 +78,7 @@ export default function CartDrawer() {
                                             <div>
                                                 <div className="flex justify-between text-base font-medium text-gray-900 dark:text-gray-100">
                                                     <h3 className="font-heading">{item.name}</h3>
-                                                    <p className="ml-4 text-orange-600 dark:text-orange-500 font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                                                    <p className="ml-4 text-orange-600 dark:text-orange-500 font-bold">¥{(item.price * item.quantity).toFixed(2)}</p>
                                                 </div>
                                             </div>
                                             <div className="flex flex-1 items-end justify-between text-sm">
@@ -103,7 +103,7 @@ export default function CartDrawer() {
                         <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-6 sm:px-6 bg-gray-50 dark:bg-gray-800/50">
                             <div className="flex justify-between text-base font-medium text-gray-900 dark:text-gray-100 mb-4">
                                 <p>{t('cart_subtotal')}</p>
-                                <p className="text-xl font-bold text-orange-600">${cartTotal.toFixed(2)}</p>
+                                <p className="text-xl font-bold text-orange-600">¥{cartTotal.toFixed(2)}</p>
                             </div>
                             <button
                                 onClick={handleCheckout}

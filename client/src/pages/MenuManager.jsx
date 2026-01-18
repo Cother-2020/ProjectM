@@ -93,7 +93,7 @@ export default function MenuManager() {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-start">
                                             <h3 className="font-bold text-gray-900 truncate pr-2" title={product.name}>{product.name}</h3>
-                                            <span className="font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded text-sm">${product.price}</span>
+                                            <span className="font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded text-sm">¥{product.price}</span>
                                         </div>
                                         <p className="text-sm text-gray-500 line-clamp-2 mt-1 h-10">{product.description}</p>
                                     </div>

@@ -56,7 +56,7 @@ export default function Admin() {
                                     </li>
                                 ))}
                             </ul>
-                            <div className="font-bold text-xl text-slate-900 border-t pt-2 border-dashed border-gray-300">Total: ${order.totalAmount.toFixed(2)}</div>
+                            <div className="font-bold text-xl text-slate-900 border-t pt-2 border-dashed border-gray-300">Total: ¥{order.totalAmount.toFixed(2)}</div>
                         </div>
 
                         <div className="flex gap-3 w-full md:w-auto">

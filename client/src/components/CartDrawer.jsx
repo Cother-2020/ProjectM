@@ -1,4 +1,4 @@
-import { XMarkIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, TrashIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid';
 import axios from 'axios';
 import { useState } from 'react';
@@ -14,12 +14,15 @@ export default function CartDrawer() {
     const navigate = useNavigate();
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [notes, setNotes] = useState('');
+    const [showNotesInput, setShowNotesInput] = useState(false);
 
     const handleCheckout = async () => {
         setIsCheckingOut(true);
         try {
             const orderData = {
                 totalAmount: cartTotal,
+                notes: notes.trim() || null,
                 items: cartItems.map(item => ({
                     productId: item.id,
                     quantity: item.quantity,
@@ -46,6 +49,8 @@ export default function CartDrawer() {
             setTimeout(() => {
                 toast.success(`${t('order_success')} ${res.data.id}`);
                 clearCart();
+                setNotes('');
+                setShowNotesInput(false);
                 setIsSuccess(false);
                 setIsCheckingOut(false);
                 closeCart();
@@ -147,6 +152,47 @@ export default function CartDrawer() {
                     {/* Footer */}
                     {cartItems.length > 0 && (
                         <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-6 sm:px-6 bg-gray-50 dark:bg-gray-800/50">
+                            {/* Notes Section */}
+                            <div className="mb-4">
+                                {!showNotesInput ? (
+                                    <button
+                                        onClick={() => setShowNotesInput(true)}
+                                        className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+                                    >
+                                        <PencilSquareIcon className="w-4 h-4" />
+                                        {notes ? t('cart_edit_notes') : t('cart_add_notes')}
+                                    </button>
+                                ) : (
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                {t('cart_notes_label')}
+                                            </label>
+                                            <button
+                                                onClick={() => setShowNotesInput(false)}
+                                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                            >
+                                                <XMarkIcon className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                        <textarea
+                                            value={notes}
+                                            onChange={(e) => setNotes(e.target.value)}
+                                            placeholder={t('cart_notes_placeholder')}
+                                            rows={2}
+                                            maxLength={200}
+                                            className="w-full border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                                        />
+                                        <p className="text-xs text-gray-400 text-right">{notes.length}/200</p>
+                                    </div>
+                                )}
+                                {notes && !showNotesInput && (
+                                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-2">
+                                        {notes}
+                                    </p>
+                                )}
+                            </div>
+
                             <div className="flex justify-between text-base font-medium text-gray-900 dark:text-gray-100 mb-4">
                                 <p>{t('cart_subtotal')}</p>
                                 <p className="text-xl font-bold text-orange-600">¥{cartTotal.toFixed(2)}</p>

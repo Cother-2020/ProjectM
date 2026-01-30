@@ -13,6 +13,15 @@ model Category {
   products  Product[]
 }
 
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  role         String   @default("ADMIN") // ADMIN, MANAGER
+  createdAt    DateTime @default(now())
+  lastLoginAt  DateTime?
+}
+
 model Product {
   id          Int         @id @default(autoincrement())
   name        String
@@ -49,7 +58,11 @@ model Order {
   createdAt   DateTime    @default(now())
   status      String      @default("PENDING") // PENDING, PREPARING, READY, COMPLETED
   totalAmount Float
+  notes       String?     // Customer notes/remarks
+  cancelReason String?    // Reason for cancellation
+  canceledAt  DateTime?   // When the order was canceled
   items       OrderItem[]
+  statusHistory OrderStatusHistory[]
 }
 
 model OrderItem {
@@ -69,4 +82,16 @@ model OrderItemOption {
   price       Float     // The price modifier amount
   orderItemId Int
   orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+}
+
+// Track status changes and exception handling notes
+model OrderStatusHistory {
+  id         Int      @id @default(autoincrement())
+  orderId    Int
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  fromStatus String?
+  toStatus   String
+  reason     String?
+  note       String?
+  createdAt  DateTime @default(now())
 }

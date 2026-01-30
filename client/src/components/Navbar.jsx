@@ -1,4 +1,4 @@
-import { ShoppingBagIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import { ShoppingBagIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useTranslation } from '../context/LanguageContext';
@@ -16,18 +16,6 @@ export default function Navbar() {
                     {t('nav_title')}
                 </Link>
                 <div className="flex items-center gap-2 sm:gap-4">
-                    {/* Order Tracking Link */}
-                    <Link
-                        to="/order"
-                        className="p-2 hover:bg-orange-50 dark:hover:bg-gray-800 rounded-full transition-colors group flex items-center gap-2"
-                        title={t('nav_my_orders')}
-                    >
-                        <ClipboardDocumentListIcon className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-orange-600 dark:group-hover:text-orange-500 transition-colors" />
-                        <span className="hidden sm:inline text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-orange-600 dark:group-hover:text-orange-500">
-                            {t('nav_my_orders')}
-                        </span>
-                    </Link>
-
                     <ThemeToggle />
                     <LanguageSwitcher />
 

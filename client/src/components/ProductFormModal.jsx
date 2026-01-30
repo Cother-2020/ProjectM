@@ -225,7 +225,7 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
                             {/* Modifiers Section */}
                             <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
                                 <div className="flex justify-between items-center mb-3">
-                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Specifications / Modifiers</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">{t('dish_form_modifiers_title')}</label>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -237,9 +237,9 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
                                                 ]
                                             }));
                                         }}
-                                        className="text-xs bg-orange-100 text-orange-700 hover:bg-orange-200 px-3 py-1 rounded-full font-medium transition-colors"
+                                        className="text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50 px-3 py-1 rounded-full font-medium transition-colors"
                                     >
-                                        + Add Group
+                                        {t('dish_form_add_group')}
                                     </button>
                                 </div>
 
@@ -250,7 +250,7 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
                                                 <div className="flex-1">
                                                     <input
                                                         type="text"
-                                                        placeholder="Group Name (e.g. Size)"
+                                                        placeholder={t('dish_form_group_name_placeholder')}
                                                         className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                                         value={group.name}
                                                         onChange={e => {
@@ -274,9 +274,9 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
 
                                             <div className="flex gap-4 mb-3 text-xs text-gray-600 dark:text-gray-400">
                                                 <label className="flex items-center gap-2">
-                                                    Required?
+                                                    {t('dish_form_required')}
                                                     <select
-                                                        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700"
+                                                        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                                         value={group.minSelect}
                                                         onChange={e => {
                                                             const newGroups = [...formData.optionGroups];
@@ -284,14 +284,14 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
                                                             setFormData({ ...formData, optionGroups: newGroups });
                                                         }}
                                                     >
-                                                        <option value={0}>Optional</option>
-                                                        <option value={1}>Required</option>
+                                                        <option value={0}>{t('dish_form_optional')}</option>
+                                                        <option value={1}>{t('dish_form_required_yes')}</option>
                                                     </select>
                                                 </label>
                                                 <label className="flex items-center gap-2">
-                                                    Selection:
+                                                    {t('dish_form_selection')}
                                                     <select
-                                                        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700"
+                                                        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                                         value={group.maxSelect}
                                                         onChange={e => {
                                                             const newGroups = [...formData.optionGroups];
@@ -299,8 +299,8 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
                                                             setFormData({ ...formData, optionGroups: newGroups });
                                                         }}
                                                     >
-                                                        <option value={1}>Single Select</option>
-                                                        <option value={5}>Multi Select</option>
+                                                        <option value={1}>{t('dish_form_single_select')}</option>
+                                                        <option value={5}>{t('dish_form_multi_select')}</option>
                                                     </select>
                                                 </label>
                                             </div>
@@ -310,7 +310,7 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
                                                     <div key={oIndex} className="flex gap-2 items-center">
                                                         <input
                                                             type="text"
-                                                            placeholder="Option Name"
+                                                            placeholder={t('dish_form_option_name_placeholder')}
                                                             className="flex-1 text-sm border border-gray-300 dark:border-gray-600 rounded px-3 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                                             value={option.name}
                                                             onChange={e => {
@@ -321,7 +321,7 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
                                                         />
                                                         <input
                                                             type="number"
-                                                            placeholder="+ Price"
+                                                            placeholder={t('dish_form_price_modifier_placeholder')}
                                                             className="w-20 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                                             value={option.priceModifier}
                                                             onChange={e => {
@@ -350,15 +350,15 @@ export default function ProductFormModal({ isOpen, onClose, product, categories,
                                                         newGroups[gIndex].options.push({ name: '', priceModifier: 0 });
                                                         setFormData({ ...formData, optionGroups: newGroups });
                                                     }}
-                                                    className="text-xs text-orange-600 hover:text-orange-700 font-medium"
+                                                    className="text-xs text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-medium"
                                                 >
-                                                    + Add Option
+                                                    {t('dish_form_add_option')}
                                                 </button>
                                             </div>
                                         </div>
                                     ))}
                                     {(!formData.optionGroups || formData.optionGroups.length === 0) && (
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 text-center italic py-2">No specifications configured.</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 text-center italic py-2">{t('dish_form_no_modifiers')}</p>
                                     )}
                                 </div>
                             </div>

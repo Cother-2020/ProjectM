@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { requireAuth } = require('../middleware/auth');
 
 // Configure storage
 const storage = multer.diskStorage({
@@ -34,7 +35,7 @@ const upload = multer({
 });
 
 // Upload endpoint
-router.post('/', upload.single('image'), (req, res) => {
+router.post('/', requireAuth, upload.single('image'), (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'Please upload a file' });

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../prismaClient');
+const { requireAuth } = require('../middleware/auth');
 
 router.get('/', async (req, res) => {
     const { categoryId } = req.query;
@@ -29,7 +30,7 @@ router.get('/', async (req, res) => {
 });
 
 // Add Product (Admin)
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
     const { name, description, price, imageUrl, categoryId, optionGroups } = req.body;
 
     if (!name || !price || !categoryId) {
@@ -79,7 +80,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update Product (Admin)
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
     const { id } = req.params;
     const { name, description, price, imageUrl, categoryId, optionGroups } = req.body;
 
@@ -135,7 +136,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete Product (Admin)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
     const { id } = req.params;
     try {
         await prisma.product.delete({ where: { id: parseInt(id) } });

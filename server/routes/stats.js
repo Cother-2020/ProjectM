@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../prismaClient');
+const { requireAuth } = require('../middleware/auth');
 
 // Get Dashboard Statistics
-router.get('/', async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
     try {
         const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -35,7 +36,8 @@ router.get('/', async (req, res) => {
             PENDING: allOrders.filter(o => o.status === 'PENDING').length,
             PREPARING: allOrders.filter(o => o.status === 'PREPARING').length,
             READY: allOrders.filter(o => o.status === 'READY').length,
-            COMPLETED: allOrders.filter(o => o.status === 'COMPLETED').length
+            COMPLETED: allOrders.filter(o => o.status === 'COMPLETED').length,
+            CANCELED: allOrders.filter(o => o.status === 'CANCELED').length
         };
 
         // Pending orders count

@@ -13,10 +13,12 @@ import {
 import { useTranslation } from '../context/LanguageContext';
 import ThemeToggle from './ThemeToggle';
 import LanguageSwitcher from './LanguageSwitcher';
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminLayout() {
     const location = useLocation();
     const { t } = useTranslation();
+    const { logout } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const navigation = [
@@ -66,10 +68,17 @@ export default function AdminLayout() {
             </div>
 
             <div className="p-4 border-t border-gray-800/50 dark:border-gray-700/50">
+                <button
+                    onClick={logout}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+                >
+                    <ArrowLeftOnRectangleIcon className="w-5 h-5" />
+                    <span className="font-medium">{t('admin_logout')}</span>
+                </button>
                 <Link
                     to="/"
                     onClick={onLinkClick}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+                    className="mt-2 flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
                 >
                     <ArrowLeftOnRectangleIcon className="w-5 h-5" />
                     <span className="font-medium">{t('admin_back_to_client')}</span>

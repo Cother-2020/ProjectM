@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../prismaClient');
+const { requireAuth } = require('../middleware/auth');
 
 router.get('/', async (req, res) => {
     try {
@@ -12,7 +13,7 @@ router.get('/', async (req, res) => {
 });
 
 // Add Category (Admin)
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
     const { name } = req.body;
     try {
         const category = await prisma.category.create({
@@ -25,7 +26,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update Category (Admin)
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
 
@@ -41,7 +42,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete Category (Admin)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
     const { id } = req.params;
     const { force } = req.query; // Check for force flag
 

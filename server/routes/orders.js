@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../prismaClient');
+const { requireAuth } = require('../middleware/auth');
+
+const ALLOWED_STATUSES = new Set(["PENDING", "PREPARING", "READY", "COMPLETED", "CANCELED"]);
 
 // Create Order
 router.post('/', async (req, res) => {
-    const { items, totalAmount } = req.body; // items: [{ productId, quantity, selectedOptions: [{ name, price }] }]
+    const { items, totalAmount, notes } = req.body; // items: [{ productId, quantity, selectedOptions: [{ name, price }] }]
 
     if (!items || items.length === 0) {
         return res.status(400).json({ error: 'No items in order' });
@@ -14,6 +17,7 @@ router.post('/', async (req, res) => {
         const order = await prisma.order.create({
             data: {
                 totalAmount,
+                notes: notes || null,
                 items: {
                     create: items.map(item => ({
                         productId: item.productId,
@@ -25,16 +29,29 @@ router.post('/', async (req, res) => {
                             })) || []
                         }
                     }))
+                },
+                statusHistory: {
+                    create: {
+                        fromStatus: null,
+                        toStatus: "PENDING",
+                        note: "Order created"
+                    }
                 }
             },
             include: {
                 items: {
                     include: {
+                        product: true,
                         selectedOptions: true
                     }
                 }
             }
         });
+
+        // Emit real-time event
+        const io = req.app.get('io');
+        io.emit('order:new', order);
+
         res.json(order);
     } catch (error) {
         console.error(error);
@@ -43,7 +60,7 @@ router.post('/', async (req, res) => {
 });
 
 // Get Order by ID (Customer tracking)
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireAuth, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -70,7 +87,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // List Orders (Admin)
-router.get('/', async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
     try {
         const orders = await prisma.order.findMany({
             include: {
@@ -90,16 +107,126 @@ router.get('/', async (req, res) => {
 });
 
 // Update Status
-router.patch('/:id/status', async (req, res) => {
+router.patch('/:id/status', requireAuth, async (req, res) => {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, note } = req.body;
+
+    if (!status || !ALLOWED_STATUSES.has(status)) {
+        return res.status(400).json({ error: 'Invalid status' });
+    }
 
     try {
-        const order = await prisma.order.update({
-            where: { id: parseInt(id) },
-            data: { status }
+        const order = await prisma.$transaction(async (tx) => {
+            const existing = await tx.order.findUnique({ where: { id: parseInt(id) } });
+            if (!existing) return null;
+
+            const updated = await tx.order.update({
+                where: { id: parseInt(id) },
+                data: { status },
+                include: {
+                    items: {
+                        include: {
+                            product: true,
+                            selectedOptions: true
+                        }
+                    }
+                }
+            });
+
+            await tx.orderStatusHistory.create({
+                data: {
+                    orderId: updated.id,
+                    fromStatus: existing.status,
+                    toStatus: status,
+                    note: note || null
+                }
+            });
+
+            return updated;
         });
+
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Emit real-time event
+        const io = req.app.get('io');
+        io.emit('order:update', order);
+
         res.json(order);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Cancel Order (Exception handling)
+router.patch('/:id/cancel', requireAuth, async (req, res) => {
+    const { id } = req.params;
+    const { reason, note } = req.body;
+
+    if (!reason || typeof reason !== 'string') {
+        return res.status(400).json({ error: 'Cancel reason is required' });
+    }
+
+    try {
+        const order = await prisma.$transaction(async (tx) => {
+            const existing = await tx.order.findUnique({ where: { id: parseInt(id) } });
+            if (!existing) return null;
+
+            const updated = await tx.order.update({
+                where: { id: parseInt(id) },
+                data: {
+                    status: "CANCELED",
+                    cancelReason: reason,
+                    canceledAt: new Date()
+                },
+                include: {
+                    items: {
+                        include: {
+                            product: true,
+                            selectedOptions: true
+                        }
+                    }
+                }
+            });
+
+            await tx.orderStatusHistory.create({
+                data: {
+                    orderId: updated.id,
+                    fromStatus: existing.status,
+                    toStatus: "CANCELED",
+                    reason,
+                    note: note || null
+                }
+            });
+
+            return updated;
+        });
+
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        const io = req.app.get('io');
+        io.emit('order:update', order);
+
+        res.json(order);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Order status history
+router.get('/:id/history', requireAuth, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const history = await prisma.orderStatusHistory.findMany({
+            where: { orderId: parseInt(id) },
+            orderBy: { createdAt: 'asc' }
+        });
+
+        res.json(history);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

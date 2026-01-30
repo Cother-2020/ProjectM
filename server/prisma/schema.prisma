@@ -23,6 +23,25 @@ model Product {
   categoryId  Int
   category    Category    @relation(fields: [categoryId], references: [id])
   orderItems  OrderItem[]
+  optionGroups OptionGroup[]
+}
+
+model OptionGroup {
+  id          Int      @id @default(autoincrement())
+  name        String   // e.g. "Size", "Sugar"
+  minSelect   Int      @default(0) // 0=Optional, 1=Required
+  maxSelect   Int      @default(1) // 1=Single Select, >1=Multi Select
+  productId   Int
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  options     Option[]
+}
+
+model Option {
+  id            Int         @id @default(autoincrement())
+  name          String      // e.g. "Large", "No Sugar"
+  priceModifier Float       @default(0.0)
+  groupId       Int
+  group         OptionGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }
 
 model Order {
@@ -40,4 +59,14 @@ model OrderItem {
   order     Order   @relation(fields: [orderId], references: [id])
   productId Int
   product   Product @relation(fields: [productId], references: [id])
+  selectedOptions OrderItemOption[]
+}
+
+// Snapshot of the selected option at the time of order
+model OrderItemOption {
+  id          Int       @id @default(autoincrement())
+  name        String    // e.g. "Size: Large"
+  price       Float     // The price modifier amount
+  orderItemId Int
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
 }

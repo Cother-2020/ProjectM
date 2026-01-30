@@ -5,6 +5,7 @@ const categoriesRoutes = require('./routes/categories');
 const productsRoutes = require('./routes/products');
 const ordersRoutes = require('./routes/orders');
 const uploadRoutes = require('./routes/upload');
+const statsRoutes = require('./routes/stats');
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use('/api/categories', categoriesRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/stats', statsRoutes);
 
 app.get('/', (req, res) => {
   res.send('ProjectM API is running');

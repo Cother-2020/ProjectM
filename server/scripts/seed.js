@@ -49,7 +49,7 @@ const setup = async () => {
             });
             console.log(`Updated dish: ${dish.name}`);
         } else {
-            await prisma.product.create({
+            const product = await prisma.product.create({
                 data: {
                     name: dish.name,
                     description: `Delicious ${dish.name} made with fresh ingredients. A perfect choice for a hungry customer.`,
@@ -59,7 +59,56 @@ const setup = async () => {
                     categoryId: categoryMap[dish.category]
                 }
             });
-            console.log(`Created dish: ${dish.name}`);
+
+            // Add sample modifiers
+            if (dish.name.includes('Burger')) {
+                await prisma.optionGroup.create({
+                    data: {
+                        name: 'Add-ons',
+                        productId: product.id,
+                        minSelect: 0,
+                        maxSelect: 2,
+                        options: {
+                            create: [
+                                { name: 'Extra Cheese', priceModifier: 5 },
+                                { name: 'Bacon', priceModifier: 8 }
+                            ]
+                        }
+                    }
+                });
+            } else if (dish.name.includes('Latte') || dish.name.includes('Americano')) {
+                await prisma.optionGroup.create({
+                    data: {
+                        name: 'Size',
+                        productId: product.id,
+                        minSelect: 1, // Required
+                        maxSelect: 1, // Single select
+                        options: {
+                            create: [
+                                { name: 'Regular', priceModifier: 0 },
+                                { name: 'Large', priceModifier: 4 }
+                            ]
+                        }
+                    }
+                });
+                await prisma.optionGroup.create({
+                    data: {
+                        name: 'Sugar Level',
+                        productId: product.id,
+                        minSelect: 1,
+                        maxSelect: 1,
+                        options: {
+                            create: [
+                                { name: 'Standard', priceModifier: 0 },
+                                { name: 'Less Sugar', priceModifier: 0 },
+                                { name: 'No Sugar', priceModifier: 0 }
+                            ]
+                        }
+                    }
+                });
+            }
+
+            console.log(`Created dish with modifiers: ${dish.name}`);
         }
     }
     console.log('✅ Test data setup completed.');

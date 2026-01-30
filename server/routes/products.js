@@ -12,7 +12,16 @@ router.get('/', async (req, res) => {
                 where.categoryId = parsedId;
             }
         }
-        const products = await prisma.product.findMany({ where });
+        const products = await prisma.product.findMany({
+            where,
+            include: {
+                optionGroups: {
+                    include: {
+                        options: true
+                    }
+                }
+            }
+        });
         res.json(products);
     } catch (e) {
         res.status(500).json({ error: e.message });
@@ -21,7 +30,7 @@ router.get('/', async (req, res) => {
 
 // Add Product (Admin)
 router.post('/', async (req, res) => {
-    const { name, description, price, imageUrl, categoryId } = req.body;
+    const { name, description, price, imageUrl, categoryId, optionGroups } = req.body;
 
     if (!name || !price || !categoryId) {
         return res.status(400).json({ error: 'Name, price, and categoryId are required' });
@@ -42,7 +51,25 @@ router.post('/', async (req, res) => {
                 price: priceFloat,
                 imageUrl: imageUrl || 'https://placehold.co/400x300?text=Food',
                 availableTime: req.body.availableTime || 'ALL',
-                categoryId: categoryIdInt
+                categoryId: categoryIdInt,
+                optionGroups: {
+                    create: optionGroups?.map(group => ({
+                        name: group.name,
+                        minSelect: group.minSelect,
+                        maxSelect: group.maxSelect,
+                        options: {
+                            create: group.options.map(opt => ({
+                                name: opt.name,
+                                priceModifier: parseFloat(opt.priceModifier)
+                            }))
+                        }
+                    }))
+                }
+            },
+            include: {
+                optionGroups: {
+                    include: { options: true }
+                }
             }
         });
         res.json(product);
@@ -54,7 +81,7 @@ router.post('/', async (req, res) => {
 // Update Product (Admin)
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, description, price, imageUrl, categoryId } = req.body;
+    const { name, description, price, imageUrl, categoryId, optionGroups } = req.body;
 
     const priceFloat = parseFloat(price);
     const categoryIdInt = parseInt(categoryId);
@@ -64,6 +91,14 @@ router.put('/:id', async (req, res) => {
     }
 
     try {
+        // First delete existing option groups (simplest way to handle updates)
+        // In a production app, we might want to diff and update to preserve IDs
+        if (optionGroups) {
+            await prisma.optionGroup.deleteMany({
+                where: { productId: parseInt(id) }
+            });
+        }
+
         const product = await prisma.product.update({
             where: { id: parseInt(id) },
             data: {
@@ -72,7 +107,25 @@ router.put('/:id', async (req, res) => {
                 price: priceFloat,
                 imageUrl,
                 availableTime: req.body.availableTime,
-                categoryId: categoryIdInt
+                categoryId: categoryIdInt,
+                optionGroups: optionGroups ? {
+                    create: optionGroups.map(group => ({
+                        name: group.name,
+                        minSelect: group.minSelect,
+                        maxSelect: group.maxSelect,
+                        options: {
+                            create: group.options.map(opt => ({
+                                name: opt.name,
+                                priceModifier: parseFloat(opt.priceModifier)
+                            }))
+                        }
+                    }))
+                } : undefined
+            },
+            include: {
+                optionGroups: {
+                    include: { options: true }
+                }
             }
         });
         res.json(product);

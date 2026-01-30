@@ -1,16 +1,19 @@
 import { XMarkIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid';
 import axios from 'axios';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import toast from 'react-hot-toast';
 
 import { useTranslation } from '../context/LanguageContext';
 
 export default function CartDrawer() {
     const { isCartOpen, closeCart, cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useCart();
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [isCheckingOut, setIsCheckingOut] = useState(false);
-
-    // Use context total or calculate it? Context has it.
+    const [isSuccess, setIsSuccess] = useState(false);
 
     const handleCheckout = async () => {
         setIsCheckingOut(true);
@@ -19,30 +22,55 @@ export default function CartDrawer() {
                 totalAmount: cartTotal,
                 items: cartItems.map(item => ({
                     productId: item.id,
-                    quantity: item.quantity
+                    quantity: item.quantity,
+                    selectedOptions: item.selectedOptions?.map(opt => ({
+                        name: opt.name,
+                        price: opt.price
+                    })) || []
                 }))
             };
             const res = await axios.post('/api/orders', orderData);
-            alert(`${t('order_success')} ${res.data.id}`);
-            clearCart();
-            closeCart();
+
+            // Save to local history
+            const bgOrders = JSON.parse(localStorage.getItem('recentOrders') || '[]');
+            const updatedOrders = [
+                { id: res.data.id, date: new Date().toISOString(), total: cartTotal },
+                ...bgOrders
+            ].slice(0, 5); // Keep last 5
+            localStorage.setItem('recentOrders', JSON.stringify(updatedOrders));
+
+            // Show success state
+            setIsSuccess(true);
+
+            // Delay navigation for animation
+            setTimeout(() => {
+                toast.success(`${t('order_success')} ${res.data.id}`);
+                clearCart();
+                setIsSuccess(false);
+                setIsCheckingOut(false);
+                closeCart();
+                // Navigate to order tracking page
+                navigate(`/order/${res.data.id}`);
+            }, 2000);
+
         } catch (error) {
-            alert(t('order_failed'));
+            toast.error(t('order_failed'));
             console.error(error);
-        } finally {
             setIsCheckingOut(false);
         }
     };
 
+    const calculateItemPrice = (item) => {
+        let price = item.price;
+        if (item.selectedOptions) {
+            item.selectedOptions.forEach(opt => {
+                price += opt.price || 0;
+            });
+        }
+        return price;
+    };
+
     if (!isCartOpen) return null;
-
-    // Remaining code uses cartItems, updateQuantity etc which are now from scope. 
-    // Need to make sure the prop usage in JSX matches the variables in scope. 
-    // They match exactly.
-
-    // I need to replace the component definition and the props usage in rendered JSX?
-    // The previous props names match the context names: updateQuantity, removeFromCart.
-    // So the JSX body can largely remain the same, except for 'onClose' -> 'closeCart' and 'total'
 
     return (
         <div className="fixed inset-0 z-50 overflow-hidden">
@@ -59,6 +87,17 @@ export default function CartDrawer() {
                         </button>
                     </div>
 
+                    {/* Success Overlay */}
+                    {isSuccess && (
+                        <div className="absolute inset-0 z-50 bg-white dark:bg-gray-800 flex flex-col items-center justify-center animate-fadeIn">
+                            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6 animate-bounce">
+                                <CheckCircleIconSolid className="w-12 h-12 text-green-500" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('success')}!</h3>
+                            <p className="text-gray-500 dark:text-gray-400">{t('order_status_pending')}</p>
+                        </div>
+                    )}
+
                     {/* Items */}
                     <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
                         {cartItems.length === 0 ? (
@@ -70,7 +109,7 @@ export default function CartDrawer() {
                         ) : (
                             <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                                 {cartItems.map((item) => (
-                                    <li key={item.id} className="flex py-6 group">
+                                    <li key={item.cartItemId} className="flex py-6 group">
                                         <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 dark:border-gray-700">
                                             <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500" />
                                         </div>
@@ -78,16 +117,23 @@ export default function CartDrawer() {
                                             <div>
                                                 <div className="flex justify-between text-base font-medium text-gray-900 dark:text-gray-100">
                                                     <h3 className="font-heading">{item.name}</h3>
-                                                    <p className="ml-4 text-orange-600 dark:text-orange-500 font-bold">¥{(item.price * item.quantity).toFixed(2)}</p>
+                                                    <p className="ml-4 text-orange-600 dark:text-orange-500 font-bold">¥{(calculateItemPrice(item) * item.quantity).toFixed(2)}</p>
                                                 </div>
+                                                {item.selectedOptions && item.selectedOptions.length > 0 && (
+                                                    <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 space-y-0.5">
+                                                        {item.selectedOptions.map((opt, idx) => (
+                                                            <p key={idx}>{opt.name} (+¥{opt.price})</p>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="flex flex-1 items-end justify-between text-sm">
                                                 <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-700 rounded-lg p-1">
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-6 h-6 flex items-center justify-center bg-white dark:bg-gray-600 rounded shadow-sm hover:text-orange-600 dark:text-gray-200 dark:hover:text-orange-400">-</button>
+                                                    <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)} className="w-6 h-6 flex items-center justify-center bg-white dark:bg-gray-600 rounded shadow-sm hover:text-orange-600 dark:text-gray-200 dark:hover:text-orange-400">-</button>
                                                     <span className="font-bold w-4 text-center dark:text-gray-200">{item.quantity}</span>
-                                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-6 h-6 flex items-center justify-center bg-white dark:bg-gray-600 rounded shadow-sm hover:text-orange-600 dark:text-gray-200 dark:hover:text-orange-400">+</button>
+                                                    <button onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)} className="w-6 h-6 flex items-center justify-center bg-white dark:bg-gray-600 rounded shadow-sm hover:text-orange-600 dark:text-gray-200 dark:hover:text-orange-400">+</button>
                                                 </div>
-                                                <button type="button" onClick={() => removeFromCart(item.id)} className="font-medium text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full">
+                                                <button type="button" onClick={() => removeFromCart(item.cartItemId)} className="font-medium text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full">
                                                     <TrashIcon className="w-5 h-5" />
                                                 </button>
                                             </div>

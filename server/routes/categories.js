@@ -24,6 +24,22 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Update Category (Admin)
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    try {
+        const category = await prisma.category.update({
+            where: { id: parseInt(id) },
+            data: { name }
+        });
+        res.json(category);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 // Delete Category (Admin)
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;

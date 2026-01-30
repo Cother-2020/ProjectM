@@ -19,31 +19,38 @@ export function CartProvider({ children }) {
         localStorage.setItem('cartItems', JSON.stringify(cartItems));
     }, [cartItems]);
 
+    // Helper to generate unique ID for cart items based on product + options
+    const generateCartItemId = (product) => {
+        if (!product.selectedOptions || product.selectedOptions.length === 0) {
+            return `${product.id}`;
+        }
+        const sortedOptions = [...product.selectedOptions].sort((a, b) => a.id - b.id);
+        const optionsString = sortedOptions.map(o => o.id).join('-');
+        return `${product.id}-${optionsString}`;
+    };
+
     const addToCart = (product) => {
-        let isExisting = false;
+        const cartItemId = generateCartItemId(product);
+
         setCartItems(prev => {
-            const existing = prev.find(item => item.id === product.id);
+            const existing = prev.find(item => item.cartItemId === cartItemId);
             if (existing) {
-                isExisting = true;
-                return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+                return prev.map(item => item.cartItemId === cartItemId ? { ...item, quantity: item.quantity + 1 } : item);
             }
-            return [...prev, { ...product, quantity: 1 }];
+            return [...prev, { ...product, cartItemId, quantity: 1 }];
         });
 
-        // Toast outside the setter to avoid double firing in StrictMode or re-renders
-        // We can't easily know if it was existing inside the setter callback cleanly without refs or this updated logic.
-        // Actually, safer is to just fire a generic "Added to cart" message or just fire it once.
         toast.success(`Added ${product.name} to cart`);
         setIsCartOpen(true);
     };
 
-    const updateQuantity = (id, newQuantity) => {
+    const updateQuantity = (cartItemId, newQuantity) => {
         if (newQuantity < 1) return;
-        setCartItems(prev => prev.map(item => item.id === id ? { ...item, quantity: newQuantity } : item));
+        setCartItems(prev => prev.map(item => item.cartItemId === cartItemId ? { ...item, quantity: newQuantity } : item));
     };
 
-    const removeFromCart = (id) => {
-        setCartItems(prev => prev.filter(item => item.id !== id));
+    const removeFromCart = (cartItemId) => {
+        setCartItems(prev => prev.filter(item => item.cartItemId !== cartItemId));
         toast('Item removed', { icon: '🗑️' });
     };
 
@@ -56,7 +63,18 @@ export function CartProvider({ children }) {
     const closeCart = () => setIsCartOpen(false);
 
     const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-    const cartTotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+    const calculateItemPrice = (item) => {
+        let price = item.price;
+        if (item.selectedOptions) {
+            item.selectedOptions.forEach(opt => {
+                price += opt.price || 0;
+            });
+        }
+        return price;
+    };
+
+    const cartTotal = cartItems.reduce((acc, item) => acc + (calculateItemPrice(item) * item.quantity), 0);
 
     const value = {
         cartItems,

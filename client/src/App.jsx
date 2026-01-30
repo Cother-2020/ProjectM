@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -9,7 +8,10 @@ import CartDrawer from './components/CartDrawer';
 import Admin from './pages/Admin';
 import MenuManager from './pages/MenuManager';
 import CategoryManager from './pages/CategoryManager';
+import Dashboard from './pages/Dashboard';
 import AdminLayout from './components/AdminLayout';
+import OrderTracking from './pages/OrderTracking';
+import NotFound from './pages/NotFound';
 import { Toaster } from 'react-hot-toast';
 
 function App() {
@@ -23,6 +25,7 @@ function App() {
               <Toaster position="top-right" />
               <CartDrawer />
               <Routes>
+                {/* Customer Routes */}
                 <Route path="/" element={
                   <>
                     <Navbar />
@@ -32,12 +35,20 @@ function App() {
                   </>
                 } />
 
+                {/* Order Tracking Routes */}
+                <Route path="/order" element={<OrderTracking />} />
+                <Route path="/order/:orderId" element={<OrderTracking />} />
+
                 {/* Admin Routes with Layout */}
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<Admin />} />
                   <Route path="menu" element={<MenuManager />} />
                   <Route path="categories" element={<CategoryManager />} />
+                  <Route path="dashboard" element={<Dashboard />} />
                 </Route>
+
+                {/* 404 Catch-all */}
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
           </CartProvider>

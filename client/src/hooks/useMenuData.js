@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -11,6 +11,7 @@ export function useMenuData() {
     // Filters
     const [activeCategory, setActiveCategory] = useState(null);
     const [selectedTime, setSelectedTime] = useState('ALL');
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         // Initial load of categories
@@ -45,20 +46,41 @@ export function useMenuData() {
         fetchProducts();
     }, [activeCategory]);
 
-    const filteredProducts = products.filter(p => {
-        if (selectedTime === 'ALL') return true;
-        // Check if product is available for ALL day or if the specific time is included in the CSV string
-        return p.availableTime === 'ALL' || (p.availableTime && p.availableTime.includes(selectedTime));
-    });
+    // Memoized filtered products
+    const filteredProducts = useMemo(() => {
+        return products.filter(p => {
+            // Time filter
+            if (selectedTime !== 'ALL') {
+                if (p.availableTime !== 'ALL' && (!p.availableTime || !p.availableTime.includes(selectedTime))) {
+                    return false;
+                }
+            }
+
+            // Search filter
+            if (searchQuery.trim()) {
+                const query = searchQuery.toLowerCase();
+                const nameMatch = p.name?.toLowerCase().includes(query);
+                const descMatch = p.description?.toLowerCase().includes(query);
+                if (!nameMatch && !descMatch) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }, [products, selectedTime, searchQuery]);
 
     return {
         products: filteredProducts,
+        allProducts: products, // raw products for reference
         categories,
         isLoading,
         error,
         activeCategory,
         setActiveCategory,
         selectedTime,
-        setSelectedTime
+        setSelectedTime,
+        searchQuery,
+        setSearchQuery
     };
 }

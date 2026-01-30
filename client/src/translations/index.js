@@ -2,6 +2,7 @@ export const translations = {
     en: {
         // Navbar
         nav_title: "ProjectM",
+        nav_my_orders: "My Orders",
 
         // Menu Page
         menu_title: "Our Menu",
@@ -23,6 +24,12 @@ export const translations = {
 
         // Product Card
         btn_add_to_cart: "Add to Cart",
+        btn_view_details: "View Details",
+        tag_customizable: "Customizable",
+
+        // Product Detail Modal
+        product_detail_title: "Product Details",
+        product_quantity: "Quantity",
 
         // Cart Drawer
         cart_title: "Shopping Cart",
@@ -40,11 +47,176 @@ export const translations = {
         toast_removed: "Item removed",
         toast_cleared: "Cart cleared",
         order_success: "Order Placed! ID:",
-        order_failed: "Checkout Failed"
+        order_failed: "Checkout Failed",
+
+        // Search
+        search_placeholder: "Search menu...",
+        search_no_results: "No dishes found matching your search.",
+
+        // Confirm Dialog
+        confirm_cancel: "Cancel",
+        confirm_delete: "Delete",
+        confirm_yes: "Yes",
+        confirm_no: "No",
+
+        // Order Tracking
+        order_tracking_title: "Track Your Order",
+        order_tracking_subtitle: "Enter your order number to check status",
+        order_tracking_input_placeholder: "Enter order number...",
+        order_tracking_button: "Track Order",
+        order_tracking_searching: "Searching...",
+        order_tracking_not_found: "Order not found",
+        order_tracking_not_found_msg: "Please check your order number and try again.",
+        order_status_pending: "Order Received",
+        order_status_preparing: "Preparing",
+        order_status_ready: "Ready for Pickup",
+        order_status_completed: "Completed",
+        order_items: "Order Items",
+        order_total: "Total",
+        order_placed_at: "Placed at",
+
+        // 404 Page
+        not_found_title: "Page Not Found",
+        not_found_message: "Sorry, the page you're looking for doesn't exist.",
+        not_found_back_home: "Back to Home",
+        not_found_back_admin: "Back to Admin",
+
+        // ===== Admin Section =====
+
+        // Admin Layout / Sidebar
+        admin_title: "ProjectM",
+        admin_portal: "Admin Portal",
+        admin_kitchen: "Kitchen Dashboard",
+        admin_menu: "Menu Items",
+        admin_categories: "Categories",
+        admin_dashboard: "Dashboard",
+        admin_back_to_client: "Back to Client",
+
+        // Kitchen Dashboard (Admin)
+        kitchen_title: "Kitchen Dashboard",
+        kitchen_subtitle: "Manage live orders",
+        kitchen_no_orders: "No active orders",
+        kitchen_no_orders_msg: "New orders will appear here automatically.",
+        kitchen_order_id: "Order",
+        kitchen_start_cooking: "Start Cooking",
+        kitchen_mark_ready: "Mark Ready",
+        kitchen_complete: "Complete",
+        kitchen_details: "Details",
+        kitchen_total: "Total",
+
+        // Order Status
+        status_all: "All",
+        status_pending: "Pending",
+        status_preparing: "Preparing",
+        status_ready: "Ready",
+        status_completed: "Completed",
+
+        // Order Filtering
+        filter_status: "Filter by Status",
+        filter_date: "Filter by Date",
+        filter_search: "Search orders...",
+        filter_today: "Today",
+        filter_week: "This Week",
+        filter_month: "This Month",
+        filter_all_time: "All Time",
+
+        // Menu Manager
+        menu_manager_title: "Menu Manager",
+        menu_manager_subtitle: "Manage your dishes, prices, and availability.",
+        menu_add_dish: "Add New Dish",
+        menu_no_dishes: "No dishes yet",
+        menu_no_dishes_msg: "Get started by creating your first menu item.",
+        menu_create_dish: "Create Dish",
+        menu_edit: "Edit",
+        menu_delete: "Delete",
+        menu_uncategorized: "Uncategorized",
+        menu_delete_confirm_title: "Delete Dish",
+        menu_delete_confirm_msg: "Are you sure you want to delete this dish? This action cannot be undone.",
+        menu_deleted_success: "Dish deleted",
+        menu_delete_failed: "Failed to delete",
+        menu_loading: "Loading menu management...",
+
+        // Product Form Modal
+        dish_form_title_new: "New Dish",
+        dish_form_title_edit: "Edit Dish",
+        dish_form_name: "Name",
+        dish_form_name_placeholder: "e.g. Spicy Chicken Burger",
+        dish_form_description: "Description",
+        dish_form_description_placeholder: "Describe ingredients and taste...",
+        dish_form_price: "Price (¥)",
+        dish_form_price_placeholder: "0.00",
+        dish_form_category: "Category",
+        dish_form_category_select: "Select Category",
+        dish_form_category_required: "Please create or select a category first.",
+        dish_form_availability: "Availability",
+        dish_form_all_day: "All Day",
+        dish_form_breakfast: "Breakfast",
+        dish_form_lunch: "Lunch",
+        dish_form_dinner: "Dinner",
+        dish_form_availability_hint: "Select \"All Day\" or specific meal periods.",
+        dish_form_image: "Food Image",
+        dish_form_image_hint: "Recommended: 800x600px",
+        dish_form_save: "Save Dish",
+        dish_form_saving: "Saving...",
+        dish_form_upload_failed: "Image upload failed, using previous image",
+        dish_form_updated_success: "Dish updated successfully",
+        dish_form_added_success: "Dish added successfully",
+        dish_form_save_failed: "Failed to save product",
+
+        // Category Manager
+        category_title: "Category Management",
+        category_add_title: "Add New Category",
+        category_placeholder: "e.g. Appetizers",
+        category_add_button: "Add Category",
+        category_items_count: "items",
+        category_edit: "Edit",
+        category_delete: "Delete",
+        category_created: "Category created",
+        category_updated: "Category updated",
+        category_deleted: "Category deleted",
+        category_force_deleted: "Category force deleted",
+        category_create_failed: "Failed to create category",
+        category_update_failed: "Failed to update category",
+        category_delete_failed: "Failed to delete category",
+        category_delete_confirm_title: "Delete Category",
+        category_delete_confirm_msg: "Are you sure you want to delete this category?",
+        category_force_delete_title: "Warning: Category Has Items",
+        category_force_delete_msg: "This category contains {count} dishes. Deleting it will permanently delete all those dishes too. Are you absolutely sure?",
+        category_loading: "Loading categories...",
+        category_edit_title: "Edit Category",
+        category_save: "Save",
+
+        // Dashboard / Statistics
+        dashboard_title: "Dashboard",
+        dashboard_subtitle: "Overview of your business metrics",
+        dashboard_today_orders: "Today's Orders",
+        dashboard_total_revenue: "Total Revenue",
+        dashboard_avg_order: "Average Order",
+        dashboard_pending_orders: "Pending Orders",
+        dashboard_order_status: "Order Status Distribution",
+        dashboard_top_dishes: "Top Selling Dishes",
+        dashboard_recent_orders: "Recent Orders",
+        dashboard_no_data: "No data available",
+        dashboard_loading: "Loading statistics...",
+
+        // Common
+        loading: "Loading...",
+        error: "Error",
+        success: "Success",
+        save: "Save",
+        cancel: "Cancel",
+        edit: "Edit",
+        delete: "Delete",
+        close: "Close",
+        confirm: "Confirm",
+        back: "Back",
+        next: "Next",
+        items: "items"
     },
     zh: {
         // Navbar
         nav_title: "项目M",
+        nav_my_orders: "我的订单",
 
         // Menu Page
         menu_title: "精选菜单",
@@ -66,6 +238,12 @@ export const translations = {
 
         // Product Card
         btn_add_to_cart: "加入购物车",
+        btn_view_details: "查看详情",
+        tag_customizable: "可选规格",
+
+        // Product Detail Modal
+        product_detail_title: "商品详情",
+        product_quantity: "数量",
 
         // Cart Drawer
         cart_title: "购物车",
@@ -83,6 +261,170 @@ export const translations = {
         toast_removed: "商品已移除",
         toast_cleared: "购物车已清空",
         order_success: "下单成功！订单号：",
-        order_failed: "结账失败"
+        order_failed: "结账失败",
+
+        // Search
+        search_placeholder: "搜索菜单...",
+        search_no_results: "没有找到匹配的菜品。",
+
+        // Confirm Dialog
+        confirm_cancel: "取消",
+        confirm_delete: "删除",
+        confirm_yes: "是",
+        confirm_no: "否",
+
+        // Order Tracking
+        order_tracking_title: "订单追踪",
+        order_tracking_subtitle: "输入订单号查看状态",
+        order_tracking_input_placeholder: "输入订单号...",
+        order_tracking_button: "查询订单",
+        order_tracking_searching: "查询中...",
+        order_tracking_not_found: "订单未找到",
+        order_tracking_not_found_msg: "请检查订单号后重试。",
+        order_status_pending: "已接单",
+        order_status_preparing: "制作中",
+        order_status_ready: "待取餐",
+        order_status_completed: "已完成",
+        order_items: "订单商品",
+        order_total: "合计",
+        order_placed_at: "下单时间",
+
+        // 404 Page
+        not_found_title: "页面未找到",
+        not_found_message: "抱歉，您访问的页面不存在。",
+        not_found_back_home: "返回首页",
+        not_found_back_admin: "返回管理后台",
+
+        // ===== Admin Section =====
+
+        // Admin Layout / Sidebar
+        admin_title: "项目M",
+        admin_portal: "管理后台",
+        admin_kitchen: "厨房工作台",
+        admin_menu: "菜品管理",
+        admin_categories: "分类管理",
+        admin_dashboard: "数据统计",
+        admin_back_to_client: "返回客户端",
+
+        // Kitchen Dashboard (Admin)
+        kitchen_title: "厨房工作台",
+        kitchen_subtitle: "管理实时订单",
+        kitchen_no_orders: "暂无订单",
+        kitchen_no_orders_msg: "新订单将自动出现在这里。",
+        kitchen_order_id: "订单",
+        kitchen_start_cooking: "开始制作",
+        kitchen_mark_ready: "标记完成",
+        kitchen_complete: "完成订单",
+        kitchen_details: "详情",
+        kitchen_total: "合计",
+
+        // Order Status
+        status_all: "全部",
+        status_pending: "待处理",
+        status_preparing: "制作中",
+        status_ready: "待取餐",
+        status_completed: "已完成",
+
+        // Order Filtering
+        filter_status: "按状态筛选",
+        filter_date: "按日期筛选",
+        filter_search: "搜索订单...",
+        filter_today: "今天",
+        filter_week: "本周",
+        filter_month: "本月",
+        filter_all_time: "全部时间",
+
+        // Menu Manager
+        menu_manager_title: "菜品管理",
+        menu_manager_subtitle: "管理您的菜品、价格和供应状态。",
+        menu_add_dish: "添加新菜品",
+        menu_no_dishes: "暂无菜品",
+        menu_no_dishes_msg: "点击创建您的第一个菜品。",
+        menu_create_dish: "创建菜品",
+        menu_edit: "编辑",
+        menu_delete: "删除",
+        menu_uncategorized: "未分类",
+        menu_delete_confirm_title: "删除菜品",
+        menu_delete_confirm_msg: "确定要删除这个菜品吗？此操作不可撤销。",
+        menu_deleted_success: "菜品已删除",
+        menu_delete_failed: "删除失败",
+        menu_loading: "加载菜品管理中...",
+
+        // Product Form Modal
+        dish_form_title_new: "新增菜品",
+        dish_form_title_edit: "编辑菜品",
+        dish_form_name: "菜品名称",
+        dish_form_name_placeholder: "例如：香辣鸡腿堡",
+        dish_form_description: "描述",
+        dish_form_description_placeholder: "描述食材和口味...",
+        dish_form_price: "价格 (¥)",
+        dish_form_price_placeholder: "0.00",
+        dish_form_category: "分类",
+        dish_form_category_select: "选择分类",
+        dish_form_category_required: "请先创建或选择一个分类。",
+        dish_form_availability: "供应时间",
+        dish_form_all_day: "全天供应",
+        dish_form_breakfast: "早餐",
+        dish_form_lunch: "午餐",
+        dish_form_dinner: "晚餐",
+        dish_form_availability_hint: "选择“全天供应”或特定的用餐时段。",
+        dish_form_image: "菜品图片",
+        dish_form_image_hint: "推荐尺寸：800x600像素",
+        dish_form_save: "保存菜品",
+        dish_form_saving: "保存中...",
+        dish_form_upload_failed: "图片上传失败，使用旧图片",
+        dish_form_updated_success: "菜品更新成功",
+        dish_form_added_success: "菜品添加成功",
+        dish_form_save_failed: "保存菜品失败",
+
+        // Category Manager
+        category_title: "分类管理",
+        category_add_title: "添加新分类",
+        category_placeholder: "例如：开胃菜",
+        category_add_button: "添加分类",
+        category_items_count: "个菜品",
+        category_edit: "编辑",
+        category_delete: "删除",
+        category_created: "分类已创建",
+        category_updated: "分类已更新",
+        category_deleted: "分类已删除",
+        category_force_deleted: "分类已强制删除",
+        category_create_failed: "创建分类失败",
+        category_update_failed: "更新分类失败",
+        category_delete_failed: "删除分类失败",
+        category_delete_confirm_title: "删除分类",
+        category_delete_confirm_msg: "确定要删除这个分类吗？",
+        category_force_delete_title: "警告：分类包含菜品",
+        category_force_delete_msg: "此分类包含 {count} 个菜品。删除它将永久删除所有这些菜品。确定要继续吗？",
+        category_loading: "加载分类中...",
+        category_edit_title: "编辑分类",
+        category_save: "保存",
+
+        // Dashboard / Statistics
+        dashboard_title: "数据统计",
+        dashboard_subtitle: "业务指标概览",
+        dashboard_today_orders: "今日订单",
+        dashboard_total_revenue: "总收入",
+        dashboard_avg_order: "平均订单金额",
+        dashboard_pending_orders: "待处理订单",
+        dashboard_order_status: "订单状态分布",
+        dashboard_top_dishes: "热销菜品",
+        dashboard_recent_orders: "最近订单",
+        dashboard_no_data: "暂无数据",
+        dashboard_loading: "加载统计中...",
+
+        // Common
+        loading: "加载中...",
+        error: "错误",
+        success: "成功",
+        save: "保存",
+        cancel: "取消",
+        edit: "编辑",
+        delete: "删除",
+        close: "关闭",
+        confirm: "确认",
+        back: "返回",
+        next: "下一步",
+        items: "项"
     }
 };

@@ -18,6 +18,8 @@
 - **数据库**: SQLite
 - **ORM**: Prisma IO
 - **文件处理**: Multer (图片上传)
+- **实时通信**: Socket.IO
+- **安全**: JWT + Helmet + Rate Limit
 
 ## 🚀 快速开始
 
@@ -27,11 +29,15 @@
 cd server
 # 安装依赖
 npm install
+# 复制环境变量模板并填写
+cp .env.example .env
 # 数据库迁移 (首次运行或Schema变更时)
-npx prisma migrate dev
+npx prisma migrate deploy
 # 启动开发服务器 (运行在 3000 端口)
 npm run dev
 ```
+
+> **重要**：请在 `.env` 中设置 `JWT_SECRET` 和 `ADMIN_SETUP_KEY`。
 
 ### 2. 启动前端 (Client)
 
@@ -44,6 +50,19 @@ npm run dev
 ```
 
 启动后，访问 `http://localhost:5173` 查看应用。
+
+## 🔐 管理员登录与初始化
+
+管理后台已启用登录保护。可用两种方式创建管理员：
+
+### 方式一：网页初始化
+访问 `http://localhost:5173/admin/login` → 切换到“初始化” → 输入用户名/密码/Setup Key
+
+### 方式二：命令行创建
+在 `server` 目录执行：
+```bash
+ADMIN_USERNAME=your_name ADMIN_PASSWORD=your_password npm run create-admin
+```
 
 ## 📂 项目结构
 
@@ -87,33 +106,36 @@ node server/scripts/seed.js clear
 
 ## 📝 模块开发进度
 
-### ✅ 已完成功能 (Completed) (v1.2)
+### ✅ 已完成功能 (Completed) (v1.5)
 - **公共端**
   - [x] 浏览菜单 (按分类查看)
   - [x] 购物车系统 (添加、修改数量、删除, 本地持久化)
   - [x] 响应式布局 (适配移动端/桌面端)
   - [x] **国际化支持 (i18n)**: 中英文一键切换 (UI 界面)
   - [x] **夜间模式 (Dark Mode)**: 自动跟随系统 / 手动切换
+  - [x] 订单备注 (下单时可填写)
 - **管理端**
   - [x] 管理后台布局框架
   - [x] 分类管理 (创建、删除)
   - [x] 菜品管理 (创建、编辑、删除、上传图片)
-  - [x] 菜品管理 (创建、编辑、删除、上传图片)
   - [x] **菜品显示时段设置**: 支持多时段选择 (如: 午餐 & 晚餐)
   - [x] **货币单位**: 人民币 (¥)
+  - [x] **管理员登录保护**
+  - [x] **订单状态流转 + 历史记录**
+  - [x] **订单取消与取消原因**
 - **服务端**
   - [x] RESTful API (CRUD)
   - [x] 数据库设计 (Category, Product, Order)
   - [x] 图片上传处理
+  - [x] 安全中间件 (JWT / Helmet / Rate Limit)
+  - [x] WebSocket 实时通知
 
 ### 🚧 待开发/计划中 (Pending/Planned)
-- [ ] **用户认证 (Authentication)**
-  - 管理员登录保护
+- [ ] **顾客身份体系**
   - 顾客登录/注册 (可选)
 - [ ] **支付集成**
   - 对接支付网关 (微信/支付宝/Stripe)
 - [ ] **订单处理优化**
-  - 实时订单通知 (WebSocket)
   - 订单状态流转管理界面
 - [ ] **数据分析**
   - 销售报表仪表盘

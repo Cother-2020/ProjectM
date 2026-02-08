@@ -97,6 +97,7 @@ export const translations = {
         not_found_title: "Page Not Found",
         not_found_message: "Sorry, the page you're looking for doesn't exist.",
         not_found_back_home: "Back to Home",
+        back_to_orders: "Back to Orders",
         not_found_back_admin: "Back to Admin",
 
         // ===== Admin Section =====
@@ -371,6 +372,7 @@ export const translations = {
         not_found_title: "页面未找到",
         not_found_message: "抱歉，您访问的页面不存在。",
         not_found_back_home: "返回首页",
+        back_to_orders: "返回订单列表",
         not_found_back_admin: "返回管理后台",
 
         // ===== Admin Section =====

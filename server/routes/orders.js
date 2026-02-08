@@ -60,7 +60,7 @@ router.post('/', async (req, res) => {
 });
 
 // Get Order by ID (Customer tracking)
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -86,8 +86,8 @@ router.get('/:id', requireAuth, async (req, res) => {
     }
 });
 
-// List Orders (Admin)
-router.get('/', requireAuth, async (req, res) => {
+// List Orders (Public)
+router.get('/', async (req, res) => {
     try {
         const orders = await prisma.order.findMany({
             include: {
@@ -107,7 +107,7 @@ router.get('/', requireAuth, async (req, res) => {
 });
 
 // Update Status
-router.patch('/:id/status', requireAuth, async (req, res) => {
+router.patch('/:id/status', async (req, res) => {
     const { id } = req.params;
     const { status, note } = req.body;
 
@@ -160,7 +160,7 @@ router.patch('/:id/status', requireAuth, async (req, res) => {
 });
 
 // Cancel Order (Exception handling)
-router.patch('/:id/cancel', requireAuth, async (req, res) => {
+router.patch('/:id/cancel', async (req, res) => {
     const { id } = req.params;
     const { reason, note } = req.body;
 
@@ -217,7 +217,7 @@ router.patch('/:id/cancel', requireAuth, async (req, res) => {
 });
 
 // Order status history
-router.get('/:id/history', requireAuth, async (req, res) => {
+router.get('/:id/history', async (req, res) => {
     const { id } = req.params;
 
     try {

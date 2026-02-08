@@ -39,9 +39,9 @@ function App() {
                     </>
                   } />
 
-                  {/* Order Tracking Routes (Admin only) */}
-                  <Route path="/order" element={<RequireAdmin><OrderTracking /></RequireAdmin>} />
-                  <Route path="/order/:orderId" element={<RequireAdmin><OrderTracking /></RequireAdmin>} />
+                  {/* Order Tracking Routes (Public) */}
+                  <Route path="/order" element={<OrderTracking />} />
+                  <Route path="/order/:orderId" element={<OrderTracking />} />
 
                   {/* Admin Auth */}
                   <Route path="/admin/login" element={<AdminLogin />} />

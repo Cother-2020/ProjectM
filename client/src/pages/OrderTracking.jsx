@@ -20,7 +20,9 @@ export default function OrderTracking() {
     const { t } = useTranslation();
     const { orderId } = useParams();
     const [order, setOrder] = useState(null);
+    const [allOrders, setAllOrders] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingOrders, setIsLoadingOrders] = useState(false);
     const [error, setError] = useState(null);
     const [searchInput, setSearchInput] = useState(orderId || '');
     const [history, setHistory] = useState([]);
@@ -30,6 +32,12 @@ export default function OrderTracking() {
     useEffect(() => {
         if (orderId) {
             fetchOrder(orderId);
+        } else {
+            // Clear order state when navigating back to list view
+            setOrder(null);
+            setError(null);
+            setHistory([]);
+            fetchAllOrders();
         }
     }, [orderId]);
 
@@ -74,6 +82,19 @@ export default function OrderTracking() {
             setHistory([]);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const fetchAllOrders = async () => {
+        setIsLoadingOrders(true);
+        try {
+            const res = await axios.get('/api/orders');
+            setAllOrders(res.data);
+        } catch (e) {
+            console.error('Failed to fetch orders:', e);
+            setAllOrders([]);
+        } finally {
+            setIsLoadingOrders(false);
         }
     };
 
@@ -163,13 +184,25 @@ export default function OrderTracking() {
                                 {t('order_tracking_subtitle')}
                             </p>
                         </div>
-                        <Link
-                            to="/"
-                            className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                        >
-                            <HomeIcon className="w-5 h-5" />
-                            <span className="hidden sm:inline">{t('not_found_back_home')}</span>
-                        </Link>
+                        {orderId ? (
+                            <Link
+                                to="/order"
+                                className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                            >
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+                                </svg>
+                                <span className="hidden sm:inline">{t('back_to_orders')}</span>
+                            </Link>
+                        ) : (
+                            <Link
+                                to="/"
+                                className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                            >
+                                <HomeIcon className="w-5 h-5" />
+                                <span className="hidden sm:inline">{t('not_found_back_home')}</span>
+                            </Link>
+                        )}
                     </div>
 
                     {/* Search Form */}
@@ -410,42 +443,72 @@ export default function OrderTracking() {
                 )}
 
                 {!orderId && !order && !isLoading && (
-                    <div className="max-w-md mx-auto mt-12">
-                        {(() => {
-                            const saved = localStorage.getItem('recentOrders');
-                            const recentOrders = saved ? JSON.parse(saved) : [];
+                    <div className="max-w-4xl mx-auto mt-8">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+                            <div className="px-6 py-4 bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border-b border-orange-200 dark:border-orange-800">
+                                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                                    {t('dashboard_recent_orders')}
+                                </h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                    Click on any order to view details
+                                </p>
+                            </div>
 
-                            if (recentOrders.length === 0) return null;
-
-                            return (
-                                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                                    <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 font-bold text-gray-700 dark:text-gray-200">
-                                        {t('dashboard_recent_orders')}
-                                    </div>
-                                    <ul className="divide-y divide-gray-100 dark:divide-gray-700">
-                                        {recentOrders.map((o) => (
-                                            <li key={o.id}>
-                                                <Link to={`/order/${o.id}`} className="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                                    <div className="flex justify-between items-center">
-                                                        <div>
-                                                            <div className="font-medium text-gray-900 dark:text-gray-100">
-                                                                #{o.id}
-                                                            </div>
-                                                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                                {new Date(o.date).toLocaleString()}
-                                                            </div>
-                                                        </div>
-                                                        <div className="font-bold text-orange-600">
-                                                            ¥{o.total.toFixed(2)}
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </li>
-                                        ))}
-                                    </ul>
+                            {isLoadingOrders ? (
+                                <div className="px-6 py-12 text-center">
+                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+                                    <p className="mt-4 text-gray-500 dark:text-gray-400">{t('loading')}</p>
                                 </div>
-                            );
-                        })()}
+                            ) : allOrders.length === 0 ? (
+                                <div className="px-6 py-12 text-center">
+                                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <span className="text-3xl">📋</span>
+                                    </div>
+                                    <p className="text-gray-500 dark:text-gray-400">{t('kitchen_no_orders')}</p>
+                                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{t('kitchen_no_orders_msg')}</p>
+                                </div>
+                            ) : (
+                                <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                                    {allOrders.map((o) => (
+                                        <Link
+                                            key={o.id}
+                                            to={`/order/${o.id}`}
+                                            className="block px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group"
+                                        >
+                                            <div className="flex items-center justify-between gap-4">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
+                                                            #{o.id}
+                                                        </span>
+                                                        <span className={getStatusBadgeClass(o.status)}>
+                                                            {getStatusLabel(o.status)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                                        <span className="flex items-center gap-1">
+                                                            <ClockIcon className="w-4 h-4" />
+                                                            {new Date(o.createdAt).toLocaleString()}
+                                                        </span>
+                                                        <span>
+                                                            {o.items?.length || 0} {t('items')}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-2xl font-bold text-orange-600 dark:text-orange-500">
+                                                        ¥{o.totalAmount.toFixed(2)}
+                                                    </div>
+                                                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-1 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                                                        {t('btn_view_details')} →
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
